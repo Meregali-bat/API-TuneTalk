@@ -1,0 +1,15 @@
+{
+  "name": "tunetalk2.0",
+  "version": "1.0.0",
+  "description": "TuneTalk Bagual",
+  "license": "ISC",
+  "author": "Lucas Meregali",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}
