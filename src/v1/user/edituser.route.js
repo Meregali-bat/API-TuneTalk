@@ -1,9 +1,12 @@
 const router = require('express').Router()
 const db = require('../../utils/db-utils');
 
-router.post("/signup", async (req, res) =>{
-        const user = { email, phone, name, password, phone } = req.body
+router.put("/edituser", async (req, res) =>{
+        const user = { user_id, email, phone, name, password, phone } = req.body
 
+        if(!user_id) {
+            return res.status(400).json({ error: 'Necessário informar o ID do usuário!' });
+        }
         if (!name) {
             return res.status(400).json({ error: 'O nome é inválido ou está vazio!' });
         }
@@ -28,18 +31,17 @@ router.post("/signup", async (req, res) =>{
 
         try{
             connection = await db.getConexaoBanco()
-            const query = `insert into tunetalk.users (email, name, password, phone)
-                            values ($1, $2, $3, $4) returning user_id`
-            const values = [user.email, user.name, user.password, user.phone ]
+            const query = `update tunetalk.users set email = $1, name = $2, password = $3, phone = $4 where user_id = $5 returning user_id`
+            const values = [user.email, user.name, user.password, user.phone, user.user_id ]
             const dbRes = await connection.query(query, values)
-            res.status(201).json({ message: 'Usuário cadastrado com sucesso!', user_id: dbRes.rows[0].id });
+            res.status(201).json({ message: 'Usuário editado com sucesso!', user_id: dbRes.rows[0].id });
         }
         catch (err) {
-            if (err.code === '23505' && err.constraint === 'users_email_key') {
-                return res.status(400).json({ error: 'O email informado já está cadastrado. É você?' });
+            if(err.code === '23505' && err.constraint === 'users_email_key') {
+                return res.status(400).json({ err: 'O email informado já está cadastrado.' });
             }
-            console.error('Erro ao cadastrar usuário:', err);
-            res.status(500).json({ error: 'Erro ao cadastrar usuário.'});
+            console.error('Erro ao editar usuário:', err);
+            res.status(500).json({ error: 'Erro ao editar usuário.' });
         }if (connection) {
             connection.end(); 
         }
