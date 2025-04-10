@@ -14,7 +14,7 @@ app.use('/api/v1', v1Routes);
 
 app.get('/teste', async (req, res) => {
   const connection = await db.getConexaoBanco();
-  const result = await connection.query('SELECT * FROM tunetalk.users')
+  const result = await connection.query('SELECT * FROM public.users')
   res.json(result.rows)
 })
 

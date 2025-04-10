@@ -11,7 +11,7 @@ router.post("/authuser", async (req, res) =>{
 
     try{
         connection = await db.getConexaoBanco()
-        const query = `select user_id, email, phone, name from tunetalk.users 
+        const query = `select user_id, email, phone, name from public.users 
                        where (email = $1 or phone = $2) 
                        and password = $3`
         const values = [ user.email, user.phone, user.password ]

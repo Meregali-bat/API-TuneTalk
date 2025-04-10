@@ -28,7 +28,7 @@ router.post("/signup", async (req, res) =>{
 
         try{
             connection = await db.getConexaoBanco()
-            const query = `insert into tunetalk.users (email, name, password, phone)
+            const query = `insert into public.users (email, name, password, phone)
                             values ($1, $2, $3, $4) returning user_id`
             const values = [user.email, user.name, user.password, user.phone ]
             const dbRes = await connection.query(query, values)

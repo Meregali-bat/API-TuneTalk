@@ -1,9 +1,9 @@
 const router = require('express').Router();
 
 const signUp = require('./signup.route');
-const editUser = require('./edituser.route');
-const authUser = require('./authuser.route');
-const getUser = require('./getuser.route');
+const editUser = require('./edit.route');
+const authUser = require('./login.route');
+const getUser = require('./get.route');
 
 router.use(signUp, editUser, authUser, getUser);
 
