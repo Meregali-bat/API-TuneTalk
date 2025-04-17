@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const db = require('../../utils/db-utils');
+const md5 = require('md5')
 
 router.post("/authuser", async (req, res) =>{
     const user = {email, phone, password}= req.body
@@ -14,7 +15,7 @@ router.post("/authuser", async (req, res) =>{
         const query = `select user_id, email, phone, name from public.users 
                        where (email = $1 or phone = $2) 
                        and password = $3`
-        const values = [ user.email, user.phone, user.password ]
+        const values = [ user.email, user.phone, md5(user.password) ]
         const dbRes = await connection.query(query, values)
         if(dbRes.rows.length === 0) {
             return res.status(400).json({ error: 'Não encontrou nenhum usuário' });
