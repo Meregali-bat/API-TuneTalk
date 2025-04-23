@@ -1,6 +1,7 @@
 const router = require('express').Router()
 const db = require('../../utils/db-utils');
 const { validateEmailDuplicate } = require('../../utils/utils')
+const md5 = require('md5')
 
 router.post("/signup", validateEmailDuplicate, async (req, res) =>{
         const user = { email, phone, name, password, phone } = req.body
@@ -31,7 +32,7 @@ router.post("/signup", validateEmailDuplicate, async (req, res) =>{
             connection = await db.getConexaoBanco()
             const query = `insert into public.users (email, name, password, phone, insert_datetime)
                             values ($1, $2, $3, $4, CURRENT_TIMESTAMP) returning user_id`
-            const values = [user.email, user.name, user.password, user.phone ]
+            const values = [user.email, user.name, md5(user.password), user.phone ]
             const dbRes = await connection.query(query, values)
             res.status(201).json({ message: 'Usuário cadastrado com sucesso!', user_id: dbRes.rows[0].id });
         }
