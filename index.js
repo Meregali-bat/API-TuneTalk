@@ -1,8 +1,20 @@
 const express = require('express')
+const session = require('express-session')
 const app = express()
+const cors = require('cors')
 const port = 3000
 const v1Routes = require('./src/v1/index.js');
 const db = require('./src/utils/db-utils');
+
+app.use(cors());
+
+app.set('trust proxy', true);
+app.use(session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false } 
+}))
 
 app.use(express.json())
 

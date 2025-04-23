@@ -1,7 +1,8 @@
 const router = require('express').Router();
 const db = require('../../utils/db-utils');
+const { authenticateUser } = require('../../utils/utils');
 
-router.get("/getuser/:id", async (req, res) =>{
+router.get("/getuser/:id", authenticateUser, async (req, res) =>{
         const user_id = req.params.id
 
         if(!user_id){
@@ -21,6 +22,9 @@ router.get("/getuser/:id", async (req, res) =>{
             }
             const userData = dbRes.rows[0]
             delete userData.password;
+            delete userData.update_datetime;
+            delete userData.email;
+            delete userData.phone;
             res.status(200).json({ message: 'Usuário encontrado com sucesso!', userData });
         }catch (err){
             console.error('Erro ao buscar usuário:', err);

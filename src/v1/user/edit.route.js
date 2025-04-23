@@ -1,17 +1,15 @@
-const router = require('express').Router()
+const router = require('express').Router();
 const db = require('../../utils/db-utils');
+const { authenticateUser, validateEmailDuplicate } = require('../../utils/utils');
 
-router.put("/edit", async (req, res) =>{
+router.put("/edit", authenticateUser, validateEmailDuplicate, async (req, res) =>{
         const user = { user_id, email, phone, name, password, phone } = req.body
 
         if(!user_id) {
-            return res.status(400).json({ error: 'Necessário informar o ID do usuário!' });
+            return res.status(400).json({ error: 'Id não encontrado' });
         }
         if (!name) {
             return res.status(400).json({ error: 'O nome é inválido ou está vazio!' });
-        }
-        if (!password || password.length < 6) {
-            return res.status(400).json({ error: 'A senha é inválida ou está vazia!' });
         }
         if (!email && !phone) {
             return res.status(400).json({ error: 'Necessário fornecer pelo menos email ou telefone!' });
@@ -31,8 +29,8 @@ router.put("/edit", async (req, res) =>{
 
         try{
             connection = await db.getConexaoBanco()
-            const query = `update public.users set email = $1, name = $2, password = $3, phone = $4 where user_id = $5 returning user_id`
-            const values = [user.email, user.name, user.password, user.phone, user.user_id ]
+            const query = `update public.users set email = $1, name = $2, phone = $3, update_datetime = CURRENT_TIMESTAMP where user_id = $4 returning user_id`
+            const values = [user.email, user.name, user.phone, user.user_id ]
             const dbRes = await connection.query(query, values)
             res.status(201).json({ message: 'Usuário editado com sucesso!', user_id: dbRes.rows[0].id });
         }

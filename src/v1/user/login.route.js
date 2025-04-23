@@ -1,8 +1,7 @@
 const router = require('express').Router();
 const db = require('../../utils/db-utils');
-const md5 = require('md5')
 
-router.post("/authuser", async (req, res) =>{
+router.post("/login", async (req, res) =>{
     const user = {email, phone, password}= req.body
     let connection;
     
@@ -15,13 +14,21 @@ router.post("/authuser", async (req, res) =>{
         const query = `select user_id, email, phone, name from public.users 
                        where (email = $1 or phone = $2) 
                        and password = $3`
-        const values = [ user.email, user.phone, md5(user.password) ]
+        const values = [ user.email, user.phone, user.password ]
         const dbRes = await connection.query(query, values)
         if(dbRes.rows.length === 0) {
             return res.status(400).json({ error: 'Não encontrou nenhum usuário' });
-        }    
+        } 
         const userData = dbRes.rows[0]
-        res.status(200).json({ message: 'Usuário autenticado com sucesso!', user: userData });
+
+        req.session.user = {
+            user_id: userData.user_id,
+            email: userData.email,
+            phone: userData.phone,
+            name: userData.name
+        };
+
+        res.status(200).json({ message: 'Usuário autenticado com sucesso!', user: userData, session: req.session });
     }catch (err){
         console.error('Erro ao autenticar usuário: ', err)
         res.status(500).json({ error: 'Erro ao autenticar usuário.'});
