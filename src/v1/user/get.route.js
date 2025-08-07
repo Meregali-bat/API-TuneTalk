@@ -12,7 +12,7 @@ router.get("/getuser/:id", async (req, res) =>{
         try{
             connection = await db.getConexaoBanco()
             const query = `select *
-                            from public.users
+                            from tunetalk.users
                             where user_id = $1`
             const values = [user_id]
             const dbRes = await connection.query(query, values)

@@ -1,7 +1,9 @@
 const router = require('express').Router()
 const db = require('../../utils/db-utils');
+const checkDuplicateUsername = require('../../utils/duplicate_username');
+const checkDuplicateEmail = require('../../utils/duplicate_email');
 
-router.put("/edit", async (req, res) =>{
+router.put("/edit",checkDuplicateUsername, checkDuplicateEmail, async (req, res) =>{
         const user = { user_id, email, phone, name, password, phone } = req.body
 
         if(!user_id) {
@@ -31,7 +33,7 @@ router.put("/edit", async (req, res) =>{
 
         try{
             connection = await db.getConexaoBanco()
-            const query = `update public.users set email = $1, name = $2, password = $3, phone = $4 where user_id = $5 returning user_id`
+            const query = `update tunetalk.users set email = $1, name = $2, password = $3, phone = $4 where user_id = $5 returning user_id`
             const values = [user.email, user.name, user.password, user.phone, user.user_id ]
             const dbRes = await connection.query(query, values)
             res.status(201).json({ message: 'Usuário editado com sucesso!', user_id: dbRes.rows[0].id });

@@ -3,8 +3,10 @@ const app = express()
 const port = 3000
 const v1Routes = require('./src/v1/index.js');
 const db = require('./src/utils/db-utils');
+const cors = require('cors');
 
 app.use(express.json())
+app.use(cors());
 
 app.get('/',  (req, res) => {
   res.send('Tunetalk!')
@@ -14,7 +16,7 @@ app.use('/api/v1', v1Routes);
 
 app.get('/teste', async (req, res) => {
   const connection = await db.getConexaoBanco();
-  const result = await connection.query('SELECT * FROM public.users')
+  const result = await connection.query('SELECT * FROM tunetalk.users')
   res.json(result.rows)
 })
 
