@@ -1,28 +1,35 @@
 const router = require('express').Router();
+const pino = require('pino');
 const db = require('../../utils/db-utils');
+const validateFollow = require('../../utils/validate_follow');
 
-router.post("/unfollow", async (req, res) =>{
-    const user = {user_id, followee_id} = req.body
+const logger = pino();
 
-    if(!user_id || !followee_id){
-        return res.status(400).json({ error: 'IDS dos usuários não encontrados'});
+router.post('/unfollow', validateFollow, async (req, res) => {
+  const { userId, followeeId } = req.body;
+  const user = { userId, followeeId };
+
+  if (!userId || !followeeId) {
+    return res.status(400).json({ error: 'IDS dos usuários não encontrados' });
+  }
+
+  let connection;
+  try {
+    connection = await db.getConexaoBanco();
+    const query = `delete from tunetalk.users_following
+                    where user_id = $1 and following_user_id = $2 returning user_id`;
+    const values = [user.userId, user.followeeId];
+    const dbRes = await connection.query(query, values);
+    res.status(201).json({ message: 'Parou de seguir o usuário com sucesso!', userId: dbRes.rows[0].user_id });
+  } catch (err) {
+    logger.error(err, 'Erro ao parar de seguir usuário:');
+    res.status(500).json({ error: 'Erro ao parar de seguir usuário.' });
+  } finally {
+    if (connection) {
+      connection.end();
     }
-
-    let connection;
-            try{
-                connection = await db.getConexaoBanco()
-                const query = `delete from tunetalk.users_following
-                                where user_id = $1 and following_user_id = $2 returning user_id`
-                const values = [user.user_id, user.followee_id]
-                const dbRes = await connection.query(query, values)
-                res.status(201).json({ message: 'Parou de seguir o usuário com sucesso!', user_id: dbRes.rows[0].id });
-            }
-            catch (err) {
-                console.error('Erro ao parar de seguir usuário:', err);
-                res.status(500).json({ error: 'Erro ao parar de seguir usuário.'});
-            }if (connection) {
-                connection.end(); 
-            }
-})
+  }
+  return res;
+});
 
 module.exports = router;
